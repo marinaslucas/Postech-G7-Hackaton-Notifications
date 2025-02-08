@@ -14,6 +14,7 @@ model User {
   password  String   @db.VarChar(100)
   createdAt DateTime @default(now())
   videos    Video[]  @relation("UserVideos")
+  notifications Notification[] @relation("UserNotifications")
 
   @@map("users")
 }
@@ -23,6 +24,20 @@ enum VideoStatus {
   completed
   failed
   retrieved
+}
+
+model Notification {
+  id           String   @id @db.Uuid
+  destinatario String   @db.VarChar(255)
+  titulo       String   @db.VarChar(255)
+  mensagem     String   @db.Text
+  enviadoEm    DateTime @default(now())
+  userId       String?  @db.Uuid
+  user         User?    @relation(fields: [userId], references: [id], name: "UserNotifications")
+
+  @@index([userId])
+  @@index([destinatario])
+  @@map("notifications")
 }
 
 model Video {

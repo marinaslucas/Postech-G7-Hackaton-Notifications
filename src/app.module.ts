@@ -4,6 +4,7 @@ import { UsersModule } from './users/infraestructure/users.module';
 import { DatabaseModule } from './shared/infraestructure/database/database.module';
 import { AuthModule } from './auth/infraestructure/auth.module';
 import { VideoModule } from './video/infraestructure/video.module';
+import { NotificationsModule } from './notifications/infraestructure/notification.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { VideoModule } from './video/infraestructure/video.module';
     DatabaseModule,
     AuthModule,
     VideoModule,
+    NotificationsModule
   ],
 })
 export class AppModule {}
