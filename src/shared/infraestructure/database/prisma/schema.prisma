@@ -13,6 +13,45 @@ model User {
   email     String   @unique @db.VarChar(255)
   password  String   @db.VarChar(100)
   createdAt DateTime @default(now())
+  videos    Video[]  @relation("UserVideos")
+  notifications Notification[] @relation("UserNotifications")
 
-  @@map("users") //nome da tabela no banco de dados
+  @@map("users")
+}
+
+enum VideoStatus {
+  processing
+  completed
+  failed
+  retrieved
+}
+
+model Notification {
+  id           String   @id @db.Uuid
+  destinatario String   @db.VarChar(255)
+  titulo       String   @db.VarChar(255)
+  mensagem     String   @db.Text
+  enviadoEm    DateTime @default(now())
+  userId       String?  @db.Uuid
+  user         User?    @relation(fields: [userId], references: [id], name: "UserNotifications")
+
+  @@index([userId])
+  @@index([destinatario])
+  @@map("notifications")
+}
+
+model Video {
+  id                String      @id @db.Uuid
+  title             String      @db.VarChar(255)
+  userEmail         String      @db.VarChar(255)
+  base64            String      @db.Text
+  userId            String      @db.Uuid
+  user              User        @relation(fields: [userId], references: [id], name: "UserVideos")
+  status            VideoStatus @default(processing)
+  createdAt         DateTime    @default(now())
+  processedVideoUrl String?     @db.Text
+
+  @@index([userId])
+  @@index([userEmail])
+  @@map("videos")
 }

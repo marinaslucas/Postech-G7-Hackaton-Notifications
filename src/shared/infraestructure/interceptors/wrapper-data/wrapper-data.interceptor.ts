@@ -11,7 +11,7 @@ export class WrapperDataInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map(body => {
-        console.log('wrapperDataInterceptor.body', body);
+        console.log('wrapperDataInterceptor.START...');
         const isBodyNull = !body;
         const isMetaAttributeDefined = body && 'meta' in body;
         const isAccessToken = body && 'accessToken' in body;
