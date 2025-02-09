@@ -1,0 +1,79 @@
+
+name: 'Deploy GCP'
+
+on:
+  push:
+    branches: [ main, master, prod ]
+  workflow_dispatch:
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Check out repository'
+        uses: 'actions/checkout@v4'
+
+      - name: 'Set up Node.js'
+        uses: 'actions/setup-node@v4'
+        with:
+          node-version: '20.x'
+
+      - name: 'Install dependencies'
+        run: 'npm install'
+
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+      - name: 'Run Prisma Migrations'
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+      - name: 'Authenticate to GCP'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.CI_CD_GCP_POSTECH_GRUPO7 }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          project_id: 'light-ratio-447800-d5'
+
+      - name: 'Configure Docker for GCP'
+        run: 'gcloud auth configure-docker gcr.io'
+
+      - name: 'Build and push Docker image'
+        run: |
+          docker build -t gcr.io/light-ratio-447800-d5/notifications .
+          docker push gcr.io/light-ratio-447800-d5/notifications
+      - name: 'Deploy to Cloud Run'
+        run: |
+          # Save the service account key to a file
+          echo '${{ secrets.GCLOUD_KEY_FILENAME }}' > /tmp/gcloud-key.json
+          # Deploy with secrets and environment variables
+          gcloud run deploy notifications \
+            --image gcr.io/light-ratio-447800-d5/notifications \
+            --platform managed \
+            --set-secrets DATABASE_URL=projects/470771286195/secrets/DATABASE_URL:latest \
+            --set-secrets GOOGLE_APPLICATION_CREDENTIALS=projects/470771286195/secrets/GOOGLE_APPLICATION_CREDENTIALS:latest \
+            --set-secrets GCLOUD_PROJECT_ID=projects/470771286195/secrets/GCLOUD_PROJECT_ID:latest \
+            --set-secrets GCLOUD_STORAGE_BUCKET=projects/470771286195/secrets/GCLOUD_STORAGE_BUCKET:latest \
+            --set-secrets JWT_SECRET=projects/470771286195/secrets/JWT_SECRET:latest \
+            --set-secrets JWT_EXPIRES_IN=projects/470771286195/secrets/JWT_EXPIRES_IN:latest \
+            --set-env-vars NODE_ENV=production \
+            --set-env-vars NODE_TLS_REJECT_UNAUTHORIZED=0 \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 1
+          # Set IAM policy binding for public access
+          gcloud run services add-iam-policy-binding notifications \
+            --region=us-central1 \
+            --member=allUsers \
+            --role=roles/run.invoker
