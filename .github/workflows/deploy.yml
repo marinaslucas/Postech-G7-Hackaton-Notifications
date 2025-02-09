@@ -33,7 +33,7 @@ jobs:
       - name: 'Run Prisma Migrations'
         run: |
           npx prisma generate --schema ./src/shared/infraestructure/database/prisma/schema.prisma
-          npx prisma migrate deploy
+          npm run prisma:migrate:production
       - name: 'Authenticate to GCP'
         uses: 'google-github-actions/auth@v1'
         with:
