@@ -15,7 +15,7 @@ describe('NotificationPrismaRepository integration tests', () => {
   const userId = 'd4255494-f981-4d26-a2a1-35d3f5b8d36a';
 
   beforeAll(async () => {
-    //setupPrismaTests();
+    setupPrismaTests();
     module = await Test.createTestingModule({
       imports: [DatabaseModule.forTest(prismaService)],
     }).compile();
