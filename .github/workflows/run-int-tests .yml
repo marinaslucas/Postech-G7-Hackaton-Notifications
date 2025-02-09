@@ -10,18 +10,30 @@ jobs:
   int-test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: projectdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: docker
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - uses: actions/checkout@v3
-
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20'
         cache: 'npm'
-
     - name: Install dependencies
       run: npm ci
-
     - name: Run prisma generate
       run: npm run prisma:generate:test
       env:
@@ -30,7 +42,6 @@ jobs:
         NODE_ENV: test
         JWT_SECRET: test_secret
         JWT_EXPIRES_IN: 86400
-
     - name: Run prisma migrate  
       run: npm run prisma:migrate:test
       env:
@@ -39,7 +50,6 @@ jobs:
         NODE_ENV: test
         JWT_SECRET: test_secret
         JWT_EXPIRES_IN: 86400
-        
     - name: Run tests
       run: npm run test:int
       env:
