@@ -5,11 +5,6 @@ import { AuthModule } from './auth/infraestructure/auth.module';
 import { NotificationsModule } from './notifications/infraestructure/notification.module';
 
 @Module({
-  imports: [
-    EnvConfigModule,
-    DatabaseModule,
-    AuthModule,
-    NotificationsModule
-  ],
+  imports: [EnvConfigModule, DatabaseModule, AuthModule, NotificationsModule],
 })
 export class AppModule {}

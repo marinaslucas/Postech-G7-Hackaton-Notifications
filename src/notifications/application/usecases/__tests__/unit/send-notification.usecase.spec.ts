@@ -1,26 +1,29 @@
-import { SendNotificationUseCase } from "../../send-notification.usecase";
-import { NotificationRepository } from "../../../../domain/repositories/notification.repository";
-import { NotificationInMemoryRepository } from "src/notifications/infraestructure/database/in-memory/repositories/notification-in-memory.repository";
-import axios from "axios";
+import { SendNotificationUseCase } from '../../send-notification.usecase';
+import { NotificationRepository } from '../../../../domain/repositories/notification.repository';
+import { NotificationInMemoryRepository } from '../../../../infraestructure/database/in-memory/repositories/notification-in-memory.repository';
+import axios from 'axios';
+import { ServerError } from '../../../../../shared/domain/errors/server-error';
 
-jest.mock("axios");
+jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe("SendNotificationUseCase", () => {
+describe('SendNotificationUseCase', () => {
   let notificationRepository: NotificationRepository.Repository;
   let sendNotificationUseCase: SendNotificationUseCase;
 
   beforeEach(() => {
     notificationRepository = new NotificationInMemoryRepository();
-    sendNotificationUseCase = new SendNotificationUseCase(notificationRepository);
+    sendNotificationUseCase = new SendNotificationUseCase(
+      notificationRepository
+    );
     jest.clearAllMocks();
   });
 
-  it("should create a notification and send an email successfully", async () => {
+  it('should create a notification and send an email successfully', async () => {
     const input = {
-      destinatario: "test@example.com",
-      titulo: "Bem-vindo ao sistema!",
-      mensagem: "<p>Seu cadastro foi realizado com sucesso!</p>",
+      destinatario: 'test@example.com',
+      titulo: 'Bem-vindo ao sistema!',
+      mensagem: '<p>Seu cadastro foi realizado com sucesso!</p>',
     };
 
     mockedAxios.post.mockResolvedValueOnce({ status: 200 });
@@ -33,7 +36,7 @@ describe("SendNotificationUseCase", () => {
     expect(storedNotifications[0].titulo).toEqual(input.titulo);
     expect(storedNotifications[0].mensagem).toEqual(input.mensagem);
     expect(mockedAxios.post).toHaveBeenCalledWith(
-      "https://el-ctgi-login.cia.cloud.el.com.br/api/v1/identity/email",
+      'https://el-ctgi-login.cia.cloud.el.com.br/api/v1/identity/email',
       null,
       {
         params: {
@@ -45,16 +48,20 @@ describe("SendNotificationUseCase", () => {
     );
   });
 
-  it("should throw an error if email API fails", async () => {
+  it('should throw an error if email API fails', async () => {
     const input = {
-      destinatario: "test@example.com",
-      titulo: "Erro no envio",
-      mensagem: "<p>Não foi possível enviar seu e-mail</p>",
+      destinatario: 'test@example.com',
+      titulo: 'Erro no envio',
+      mensagem: '<p>Não foi possível enviar seu e-mail</p>',
     };
 
-    mockedAxios.post.mockRejectedValueOnce(new Error("Falha no servidor"));
+    mockedAxios.post.mockRejectedValueOnce(
+      new ServerError('Falha no servidor')
+    );
 
-    await expect(sendNotificationUseCase.execute(input)).rejects.toThrow("Falha ao enviar e-mail");
+    await expect(sendNotificationUseCase.execute(input)).rejects.toThrow(
+      'Falha ao enviar e-mail'
+    );
 
     const storedNotifications = await notificationRepository.findAll();
     expect(storedNotifications).toHaveLength(1);

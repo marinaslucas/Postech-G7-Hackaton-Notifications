@@ -6,9 +6,9 @@ import {
   IsString,
   MaxLength,
   MinLength,
-} from "class-validator";
-import { NotificationProps } from "../entities/notification.entity";
-import { ClassValidatorFields } from "../../../shared/domain/validators/class-validator-fields";
+} from 'class-validator';
+import { NotificationProps } from '../entities/notification.entity';
+import { ClassValidatorFields } from '../../../shared/domain/validators/class-validator-fields';
 
 export class NotificationRules {
   @IsEmail()

@@ -1,6 +1,6 @@
-import { NotificationValidatorFactory } from "../validators/notification.validator";
-import { Entity } from "../../../shared/domain/entities/entity";
-import { EntityValidationError } from "../../../shared/domain/errors/validation-error";
+import { NotificationValidatorFactory } from '../validators/notification.validator';
+import { Entity } from '../../../shared/domain/entities/entity';
+import { EntityValidationError } from '../../../shared/domain/errors/validation-error';
 
 export type NotificationProps = {
   destinatario: string;
@@ -11,7 +11,10 @@ export type NotificationProps = {
 };
 
 export class NotificationEntity extends Entity<NotificationProps> {
-  constructor(public readonly props: NotificationProps, id?: string) {
+  constructor(
+    public readonly props: NotificationProps,
+    id?: string
+  ) {
     NotificationEntity.validate(props);
     super(props, id);
     this.props.enviadoEm = props.enviadoEm ?? new Date();

@@ -1,4 +1,4 @@
-import { NotificationEntity } from "src/notifications/domain/entities/notification.entity";
+import { NotificationEntity } from 'src/notifications/domain/entities/notification.entity';
 
 export interface NotificationOutput {
   id: string;
@@ -6,6 +6,7 @@ export interface NotificationOutput {
   titulo: string;
   mensagem: string;
   enviadoEm?: Date;
+  userId?: string;
 }
 
 export class NotificationOutputMapper {
@@ -15,7 +16,8 @@ export class NotificationOutputMapper {
       destinatario: entity.destinatario,
       titulo: entity.titulo,
       mensagem: entity.mensagem,
-      enviadoEm: new Date(),
+      enviadoEm: entity.enviadoEm ?? new Date(),
+      userId: entity.userId,
     };
   }
 }

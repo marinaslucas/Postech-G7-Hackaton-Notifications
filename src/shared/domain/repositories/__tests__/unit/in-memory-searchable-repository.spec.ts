@@ -1,10 +1,10 @@
-import { userDataBuilder } from '../../../../../users/domain/testing/helpers/user-data-builder';
 import { Entity } from '../../../../../shared/domain/entities/entity';
 import { SearchableInMemoryRepository } from '../../in-memory-searchable-repository';
 import {
   SearchParams,
   SearchResult,
 } from '../../searchable-repository-contract';
+import { userDataBuilder } from '../utils/user-data-builder';
 
 const props = userDataBuilder();
 

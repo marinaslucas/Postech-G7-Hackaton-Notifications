@@ -1,7 +1,7 @@
-import { userDataBuilder } from '../../../../../users/domain/testing/helpers/user-data-builder';
 import { InMemoryRepository } from '../../in-memory-repository';
 import { Entity } from '../../../../../shared/domain/entities/entity';
 import { NotFoundError } from '../../../../../shared/domain/errors/not-found-error';
+import { userDataBuilder } from '../utils/user-data-builder';
 
 const props = userDataBuilder();
 

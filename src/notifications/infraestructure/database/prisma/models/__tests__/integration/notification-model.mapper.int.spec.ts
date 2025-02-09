@@ -1,28 +1,37 @@
-import { PrismaClient, Notification } from "@prisma/client";
-import { NotificationModelMapper } from "../../notification-model.mapper";
-import { ValidationError } from "../../../../../../../shared/domain/errors/validation-error";
-import { NotificationEntity } from "../../../../../../domain/entities/notification.entity";
-import { setupPrismaTests } from "../../../../../../../shared/infraestructure/database/prisma/testing/setup-prisma-tests";
+import { PrismaClient, Notification } from '@prisma/client';
+import { NotificationModelMapper } from '../../notification-model.mapper';
+import { ValidationError } from '../../../../../../../shared/domain/errors/validation-error';
+import { NotificationEntity } from '../../../../../../domain/entities/notification.entity';
+import { setupPrismaTests } from '../../../../../../../shared/infraestructure/database/prisma/testing/setup-prisma-tests';
 
-describe("NotificationModelMapper integration tests", () => {
+describe('NotificationModelMapper integration tests', () => {
+  const enviadoEm = new Date('2024-10-19T03:24:00');
   let prismaService: PrismaClient;
   let props: any;
 
   beforeAll(async () => {
-    //setupPrismaTests();
+    setupPrismaTests();
     prismaService = new PrismaClient();
     await prismaService.$connect();
+
+    await prismaService.user.deleteMany({
+      where: {
+        id: 'd4255494-f981-4d26-a2a1-35d3f5b8d36a',
+      },
+    });
   });
 
   beforeEach(async () => {
+    await prismaService.user.deleteMany();
     await prismaService.notification.deleteMany();
+
     props = {
-      id: "d4255494-f981-4d26-a2a1-35d3f5b8d36a",
-      destinatario: "user@example.com",
-      titulo: "Test Title",
-      mensagem: "Test Message",
-      userId: "123e4567-e89b-12d3-a456-426614174000",
-      enviadoEm: new Date(),
+      id: 'd4255494-f981-4d26-a2a1-35d3f5b8d36a',
+      destinatario: 'user@example.com',
+      titulo: 'Test Title',
+      mensagem: 'Test Message',
+      enviadoEm: enviadoEm,
+      userId: 'd4255494-f981-4d26-a2a1-35d3f5b8d36a',
     };
   });
 
@@ -30,12 +39,24 @@ describe("NotificationModelMapper integration tests", () => {
     await prismaService.$disconnect();
   });
 
-  it("should throw error when notification model is invalid", async () => {
+  it('should throw error when notification model is invalid', async () => {
     const model: Notification = Object.assign(props, { titulo: null });
-    expect(() => NotificationModelMapper.toEntity(model)).toThrowError(ValidationError);
+    expect(() => NotificationModelMapper.toEntity(model)).toThrowError(
+      ValidationError
+    );
   });
 
-  it("should convert a notification model to a notification entity", async () => {
+  it('should convert a notification model to a notification entity', async () => {
+    await prismaService.user.create({
+      data: {
+        id: 'd4255494-f981-4d26-a2a1-35d3f5b8d36a',
+        name: 'Test User',
+        email: 'testuser@example.com',
+        password: 'password123',
+        createdAt: new Date(),
+      },
+    });
+
     const model: Notification = await prismaService.notification.create({
       data: props,
     });
@@ -45,7 +66,8 @@ describe("NotificationModelMapper integration tests", () => {
     expect(sut).toBeInstanceOf(NotificationEntity);
     expect(sut.toJson()).toStrictEqual({
       ...props,
-      enviadoEm: props.enviadoEm.toISOString(), // Ajuste para data no formato ISO
+      enviadoEm,
+      userId: props.userId,
     });
   });
 });
