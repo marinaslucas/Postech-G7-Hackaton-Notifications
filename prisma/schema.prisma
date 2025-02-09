@@ -15,7 +15,7 @@ model User {
     createdAt     DateTime       @default(now())
     notifications Notification[] @relation("UserNotifications")
 
-    @@map("users")
+    @@map("Users")
 }
 
 model Notification {
@@ -29,5 +29,5 @@ model Notification {
 
     @@index([userId])
     @@index([destinatario])
-    @@map("notifications")
+    @@map("Notifications")
 }
