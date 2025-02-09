@@ -41,7 +41,9 @@
     "prisma:generate": "npx dotenv-cli -e .env -- npx prisma generate --schema ./src/shared/infraestructure/database/prisma/schema.prisma",
     "prisma:migrate:development": "npx dotenv-cli -e .env.development -- npx prisma migrate dev --schema ./src/shared/infraestructure/database/prisma/schema.prisma",
     "prisma:migrate:production": "npx dotenv-cli -e .env.production -- npx prisma migrate deploy --schema ./src/shared/infraestructure/database/prisma/schema.prisma" ,
-    "prisma:migrate:reset:development": "npx dotenv-cli -e .env.development -- npx prisma migrate reset --schema ./src/shared/infraestructure/database/prisma/schema.prisma"
+    "prisma:migrate:reset:development": "npx dotenv-cli -e .env.development -- npx prisma migrate reset --schema ./src/shared/infraestructure/database/prisma/schema.prisma",
+    "docker:build:test": "docker build --no-cache -t notifications-test .",
+    "docker:run:test": "docker run -p 8080:8080 notifications-test"
   },
   "dependencies": {
     "@fastify/static": "^7.0.4",
