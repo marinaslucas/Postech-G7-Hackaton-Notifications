@@ -1,30 +1,33 @@
-# Usa a imagem oficial do Node.js
-FROM node:18
+# Use Node.js image
+FROM node:20
 
-# Define o diretório de trabalho dentro do container
+# Set working directory
 WORKDIR /app
 
-# Copia apenas arquivos essenciais antes da instalação (otimiza o cache do Docker)
+# Copy package files
 COPY package.json package-lock.json ./
 
-# Instala as dependências de produção
-RUN npm ci --omit=dev
+# Install ALL dependencies (including dev dependencies for now)
+RUN npm ci
 
-# Copia todo o código para dentro do container
+# Copy Prisma schema
+COPY prisma ./prisma
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Copy source code
 COPY . .
 
-# Garante que o `dist/` seja criado corretamente antes de executar a aplicação
-RUN npm run build && ls -la /app/dist/
+# Build the application
+RUN npm run build
 
-# Gera os binários corretos do Prisma para Linux
-RUN npm run prisma:generate
-
-# Define variáveis de ambiente
+# Set environment variables
 ENV NODE_ENV=production
 ENV PORT=8080
 
-# Expõe a porta da aplicação
+# Expose port
 EXPOSE 8080
 
-# Comando para iniciar a aplicação
-CMD ["npm", "run", "start"]
+# Start the application
+CMD ["npm", "run", "start:prod"]
