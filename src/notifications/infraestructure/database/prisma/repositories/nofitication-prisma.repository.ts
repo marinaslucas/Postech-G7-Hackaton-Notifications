@@ -1,29 +1,37 @@
-import { ConflictError } from "../../../../../shared/domain/errors/conflict-error";
-import { NotFoundError } from "../../../../../shared/domain/errors/not-found-error";
-import { PrismaService } from "../../../../../shared/infraestructure/database/prisma/prisma.service";
-import { NotificationEntity } from "../../../../domain/entities/notification.entity";
-import { NotificationRepository } from "../../../../domain/repositories/notification.repository";
-import { NotificationModelMapper } from "../models/notification-model.mapper";
+import { NotFoundError } from '../../../../../shared/domain/errors/not-found-error';
+import { PrismaService } from '../../../../../shared/infraestructure/database/prisma/prisma.service';
+import { NotificationEntity } from '../../../../domain/entities/notification.entity';
+import { NotificationRepository } from '../../../../domain/repositories/notification.repository';
+import { NotificationModelMapper } from '../models/notification-model.mapper';
 
-export class NotificationPrismaRepository implements NotificationRepository.Repository {
-  sortableFields: string[] = ["titulo", "enviadoEm"];
+export class NotificationPrismaRepository
+  implements NotificationRepository.Repository
+{
+  sortableFields: string[] = ['titulo', 'enviadoEm'];
 
   constructor(private prismaService: PrismaService) {}
 
-  async findByDestinatario(destinatario: string): Promise<NotificationEntity | null> {
-    const model = await this.prismaService.notification.findFirst({
-      where: { destinatario },
-    });
-    return model ? NotificationModelMapper.toEntity(model) : null;
+  async findByDestinatario(
+    destinatario: string
+  ): Promise<NotificationEntity | null> {
+    try {
+      const model = await this.prismaService.notification.findFirst({
+        where: { destinatario },
+      });
+      return NotificationModelMapper.toEntity(model);
+    } catch (error) {
+      throw new NotFoundError(
+        `Notification not found for email provided ${destinatario}`
+      );
+    }
   }
 
-  // Implementação de busca paginada
   async search(
     props: NotificationRepository.SearchParams
   ): Promise<NotificationRepository.SearchResult> {
     const sortable = this.sortableFields?.includes(props.sort);
-    const orderByField = sortable ? props.sort : "enviadoEm";
-    const orderByDir = sortable ? props.sortDir : "desc";
+    const orderByField = sortable ? props.sort : 'enviadoEm';
+    const orderByDir = sortable ? props.sortDir : 'desc';
     const filter = props.filter || null;
 
     const count = await this.prismaService.notification.count({
@@ -31,7 +39,7 @@ export class NotificationPrismaRepository implements NotificationRepository.Repo
         where: {
           titulo: {
             contains: filter,
-            mode: "insensitive",
+            mode: 'insensitive',
           },
         },
       }),
@@ -42,7 +50,7 @@ export class NotificationPrismaRepository implements NotificationRepository.Repo
         where: {
           titulo: {
             contains: filter,
-            mode: "insensitive",
+            mode: 'insensitive',
           },
         },
       }),
@@ -54,7 +62,7 @@ export class NotificationPrismaRepository implements NotificationRepository.Repo
     });
 
     return new NotificationRepository.SearchResult({
-      items: models.map((model) => NotificationModelMapper.toEntity(model)),
+      items: models.map(model => NotificationModelMapper.toEntity(model)),
       total: count,
       currentPage: props.page,
       perPage: props.perPage,
@@ -86,7 +94,7 @@ export class NotificationPrismaRepository implements NotificationRepository.Repo
 
   async findAll(): Promise<NotificationEntity[]> {
     const models = await this.prismaService.notification.findMany();
-    return models.map((model) => NotificationModelMapper.toEntity(model));
+    return models.map(model => NotificationModelMapper.toEntity(model));
   }
 
   async delete(id: string): Promise<void> {
@@ -97,14 +105,15 @@ export class NotificationPrismaRepository implements NotificationRepository.Repo
   }
 
   protected async _get(id: string): Promise<NotificationEntity> {
-    const model = await this.prismaService.notification.findUnique({
-      where: { id },
-    });
-
-    if (!model) {
+    try {
+      const notification = await this.prismaService.notification.findUnique({
+        where: {
+          id,
+        },
+      });
+      return NotificationModelMapper.toEntity(notification);
+    } catch (error) {
       throw new NotFoundError(`Notification not found using ID ${id}`);
     }
-
-    return NotificationModelMapper.toEntity(model);
   }
 }

@@ -1,5 +1,5 @@
-import { faker } from "@faker-js/faker";
-import { NotificationProps } from "../../entities/notification.entity";
+import { faker } from '@faker-js/faker';
+import { NotificationProps } from '../../entities/notification.entity';
 
 export function notificationDataBuilder(
   props: Partial<NotificationProps> = {}
