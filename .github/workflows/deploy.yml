@@ -32,8 +32,8 @@ jobs:
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
       - name: 'Run Prisma Migrations'
         run: |
-          npx prisma generate --schema ./src/shared/infraestructure/database/prisma/schema.prisma
-          npm run prisma:migrate:production
+          npx prisma generate
+          npx prisma migrate deploy
       - name: 'Authenticate to GCP'
         uses: 'google-github-actions/auth@v1'
         with:
