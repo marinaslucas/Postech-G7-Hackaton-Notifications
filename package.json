@@ -12,7 +12,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "npx dotenv-cli -e .env.development -- nest start --watch",
+    "start:dev": "npx dotenv-cli -e .env.development -- ts-node-dev --respawn --transpile-only src/main.ts",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -63,7 +63,8 @@
     "class-validator": "^0.14.1",
     "dotenv-cli": "^8.0.0",
     "project": "file:",
-    "reflect-metadata": "^0.2.0"
+    "reflect-metadata": "^0.2.0",
+    "tsyringe": "^4.8.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.3.0",
@@ -88,6 +89,7 @@
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.3"
   },

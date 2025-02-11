@@ -2,7 +2,8 @@ import { PubSub } from '@google-cloud/pubsub';
 import { container } from 'tsyringe';
 import { SendNotificationUseCase } from '../../../notifications/application/usecases/send-notification.usecase';
 import { SubNotificationUseCase } from '../../../notifications/application/usecases/sub-notification.usecase';
-import { NotificationRepository } from '../../../notifications/infraestructure/repositories/notification.repository';
+import { NotificationRepository } from '../../../notifications/domain/repositories/notification.repository';
+import { NotificationPrismaRepository } from '../../../notifications/infraestructure/database/prisma/repositories/nofitication-prisma.repository';
 
 if (!process.env.GCLOUD_PROJECT_ID) {
   throw new Error('GCLOUD_PROJECT_ID environment variable is not set');
@@ -88,15 +89,24 @@ export const initializeSubscription = async () => {
 async function processMessage(data: any): Promise<void> {
   try {
     const { videoId, status, email } = data;
-    
+
     if (!videoId || !status || !email) {
-      console.error('Invalid message format. Required fields: videoId, status, email');
+      console.error(
+        'Invalid message format. Required fields: videoId, status, email'
+      );
       return;
     }
 
-    const notificationRepository = container.resolve('NotificationRepository');
-    const sendNotificationUseCase = new SendNotificationUseCase(notificationRepository);
-    const subNotificationUseCase = new SubNotificationUseCase(sendNotificationUseCase);
+    const notificationRepository =
+      container.resolve<NotificationRepository.Repository>(
+        'NotificationRepository'
+      );
+    const sendNotificationUseCase = new SendNotificationUseCase(
+      notificationRepository
+    );
+    const subNotificationUseCase = new SubNotificationUseCase(
+      sendNotificationUseCase
+    );
 
     await subNotificationUseCase.execute({ videoId, status, email });
   } catch (error) {
@@ -105,4 +115,7 @@ async function processMessage(data: any): Promise<void> {
   }
 }
 
-container.register('NotificationRepository', { useClass: NotificationRepository });
+container.registerSingleton<NotificationRepository.Repository>(
+  'NotificationRepository',
+  NotificationPrismaRepository
+);

@@ -29,5 +29,5 @@ model Notification {
 
     @@index([userId])
     @@index([destinatario])
-    @@map("Notifications")
+    @@map("notifications")
 }

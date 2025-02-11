@@ -1,10 +1,10 @@
-name: CI
+name: CI Integration Tests
 
 on:
   push:
-    branches: [ main, master, prod ]
+    branches: [main, master, prod]
   pull_request:
-    branches: [ main, master, prod ]
+    branches: [main, master, prod]
 
 jobs:
   int-test:
@@ -26,35 +26,35 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
-        cache: 'npm'
-    - name: Install dependencies
-      run: npm ci
-    - name: Run prisma generate
-      run: npm run prisma:generate:test
-      env:
-        DATABASE_URL: postgresql://postgres:docker@localhost:5432/projectdb?schema=test
-        PORT: 3000
-        NODE_ENV: test
-        JWT_SECRET: test_secret
-        JWT_EXPIRES_IN: 86400
-    - name: Run prisma migrate  
-      run: npm run prisma:migrate:test
-      env:
-        DATABASE_URL: postgresql://postgres:docker@localhost:5432/projectdb?schema=test
-        PORT: 3000
-        NODE_ENV: test
-        JWT_SECRET: test_secret
-        JWT_EXPIRES_IN: 86400
-    - name: Run tests
-      run: npm run test:int
-      env:
-        DATABASE_URL: postgresql://postgres:docker@localhost:5432/projectdb?schema=test
-        PORT: 3000
-        NODE_ENV: test
-        JWT_SECRET: test_secret
-        JWT_EXPIRES_IN: 86400
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run prisma generate
+        run: npm run prisma:generate:test
+        env:
+          DATABASE_URL: postgresql://postgres:docker@localhost:5432/projectdb?schema=test
+          PORT: 3000
+          NODE_ENV: test
+          JWT_SECRET: test_secret
+          JWT_EXPIRES_IN: 86400
+      - name: Run prisma migrate
+        run: npm run prisma:migrate:test
+        env:
+          DATABASE_URL: postgresql://postgres:docker@localhost:5432/projectdb?schema=test
+          PORT: 3000
+          NODE_ENV: test
+          JWT_SECRET: test_secret
+          JWT_EXPIRES_IN: 86400
+      - name: Run tests
+        run: npm run test:int
+        env:
+          DATABASE_URL: postgresql://postgres:docker@localhost:5432/projectdb?schema=test
+          PORT: 3000
+          NODE_ENV: test
+          JWT_SECRET: test_secret
+          JWT_EXPIRES_IN: 86400
