@@ -5,7 +5,9 @@ FROM node:20
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json ./
+COPY package*.json ./
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
 
 # Install ALL dependencies (including dev dependencies for now)
 RUN npm ci
@@ -17,13 +19,20 @@ COPY prisma ./prisma
 RUN npx prisma generate
 
 # Copy source code
-COPY . .
+COPY src ./src
+
+# Debug: List contents before build
+RUN ls -la
 
 # Build the application
 RUN npm run build
 
-# Verify the build output exists
-RUN ls -la dist/
+# Debug: List contents after build
+RUN ls -la
+RUN ls -la dist || echo "dist directory not found"
+
+# Clean up dev dependencies
+RUN npm ci --only=production
 
 # Set environment variables
 ENV NODE_ENV=production
