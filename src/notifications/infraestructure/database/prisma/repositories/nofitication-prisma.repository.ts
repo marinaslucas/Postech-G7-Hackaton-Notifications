@@ -3,7 +3,9 @@ import { PrismaService } from '../../../../../shared/infraestructure/database/pr
 import { NotificationEntity } from '../../../../domain/entities/notification.entity';
 import { NotificationRepository } from '../../../../domain/repositories/notification.repository';
 import { NotificationModelMapper } from '../models/notification-model.mapper';
+import { injectable } from 'tsyringe';
 
+@injectable()
 export class NotificationPrismaRepository
   implements NotificationRepository.Repository
 {
@@ -73,9 +75,28 @@ export class NotificationPrismaRepository
   }
 
   async insert(entity: NotificationEntity): Promise<void> {
-    await this.prismaService.notification.create({
-      data: entity.toJson(),
-    });
+    try {
+      const data = {
+        id: entity._id,
+        destinatario: entity.destinatario,
+        titulo: entity.titulo,
+        mensagem: entity.mensagem,
+        enviadoEm: entity.enviadoEm,
+        userId: entity.userId,
+      };
+
+      await this.prismaService.$transaction(async (prisma) => {
+        await prisma.notification.create({
+          data,
+        });
+      }, {
+        timeout: 20000, // 20 seconds
+        maxWait: 25000, // 25 seconds
+      });
+    } catch (error) {
+      console.error('Error inserting notification:', error);
+      throw error;
+    }
   }
 
   async update(entity: NotificationEntity): Promise<void> {

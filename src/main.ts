@@ -6,6 +6,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { applyGlobalConfig } from './global-config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { initializeSubscription } from './shared/infraestructure/messaging/pubsub-gcp.config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -29,7 +30,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  // Initialize PubSub subscription
+  await initializeSubscription();
+
   applyGlobalConfig(app);
   await app.listen(process.env.PORT, '0.0.0.0');
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
