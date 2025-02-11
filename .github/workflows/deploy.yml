@@ -66,6 +66,7 @@ jobs:
             --set-secrets JWT_EXPIRES_IN=projects/470771286195/secrets/JWT_EXPIRES_IN:latest \
             --set-secrets GCLOUD_PUBSUB_TOPIC=projects/470771286195/secrets/GCLOUD_PUBSUB_TOPIC:latest \
             --set-env-vars NODE_ENV=production \
+            --set-env-vars PRISMA_CLIENT_ENGINE_TYPE=dataproxy \
             --set-env-vars NODE_TLS_REJECT_UNAUTHORIZED=0 \
             --region us-central1 \
             --allow-unauthenticated \
