@@ -22,6 +22,9 @@ COPY . .
 # Build the application
 RUN npm run build
 
+# Verify the build output exists
+RUN ls -la dist/
+
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=8080
@@ -30,4 +33,4 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Start the application
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/main.js"]
