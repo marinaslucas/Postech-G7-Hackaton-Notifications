@@ -3,7 +3,9 @@ import { PrismaService } from '../../../../../shared/infraestructure/database/pr
 import { NotificationEntity } from '../../../../domain/entities/notification.entity';
 import { NotificationRepository } from '../../../../domain/repositories/notification.repository';
 import { NotificationModelMapper } from '../models/notification-model.mapper';
+import { injectable } from 'tsyringe';
 
+@injectable()
 export class NotificationPrismaRepository
   implements NotificationRepository.Repository
 {
