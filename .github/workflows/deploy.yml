@@ -1,9 +1,8 @@
-
 name: 'Deploy GCP'
 
 on:
   push:
-    branches: [ main, master, prod ]
+    branches: [main, master, prod]
   workflow_dispatch:
 
 concurrency:
@@ -65,6 +64,7 @@ jobs:
             --set-secrets GCLOUD_STORAGE_BUCKET=projects/470771286195/secrets/GCLOUD_STORAGE_BUCKET:latest \
             --set-secrets JWT_SECRET=projects/470771286195/secrets/JWT_SECRET:latest \
             --set-secrets JWT_EXPIRES_IN=projects/470771286195/secrets/JWT_EXPIRES_IN:latest \
+            --set-secrets GCLOUD_PUBSUB_TOPIC=projects/470771286195/secrets/GCLOUD_PUBSUB_TOPIC:latest \
             --set-env-vars NODE_ENV=production \
             --set-env-vars NODE_TLS_REJECT_UNAUTHORIZED=0 \
             --region us-central1 \
